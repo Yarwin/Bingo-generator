@@ -3,8 +3,9 @@ from PIL import Image
 from PIL import ImageDraw
 from random import shuffle
 
+
 class Bingo:
-    def __init__(self, entries, title="test", freespace="", size=5,
+    def __init__(self, entries, title="test", freespace="", size=5, randomize=True,
                  bgcolor='#FFF', fontcolor= '#000',
                  width=1600, height=900, padding=15,
                  fontpath=None, fontsize = 13):
@@ -14,13 +15,15 @@ class Bingo:
         self.img = Image.new("RGBA", (width, height), bgcolor)
         self.draw = ImageDraw.Draw(self.img)
         self.entries = entries
-        shuffle(entries)
         self.p = padding
         self.size = size
         self.color = fontcolor
         self.width, self.height = width, height
         self.line_width = (self.width // (self.size - 1) ) - (self.size + 1)  * self.p
         self.line_height = (self.height // (self.size -1)) - self.size * self.p
+
+        if randomize:
+            shuffle(entries)
 
         if freespace:
             freespace_index = (self.size // 2) * self.size + self.size // 2 + 1
@@ -33,31 +36,33 @@ class Bingo:
                        self.title, self.color, font=self.title_font)
 
     def split_entry(self, entry):
-        d = entry.split(' ')
-        output = d[0]
-        for i in d[1:]:
-            if self.font.getsize(output.split('\n')[-1] + i)[0] > self.line_width:
+        entry = entry.split(' ')
+        output = entry[0]
+        
+        for i in entry[1:]:
+            last_line_width = self.font.getsize(output.split('\n')[-1] + i)[0]
+            if last_line_width > self.line_width:
                 output += '\n' + i
             else:
                 output += ' ' + i
         return output
 
     def split_entries(self):
-        for i, e in enumerate(self.entries):
-            if self.font.getsize(e)[0] > self.line_width:
-                self.entries[i] = self.split_entry(e)
+        for i, entry in enumerate(self.entries):
+            if self.font.getsize(entry)[0] > self.line_width:
+                self.entries[i] = self.split_entry(entry)
 
     def draw_entry(self, entry, x, y):
-        new_x = x
-        for e in entry.split('\n'):
-            e_size = self.font.getsize(e)[0]
-            if e_size < self.line_width:
-                new_x += (self.line_width - e_size) // 2
-            self.draw.text((new_x, y),
-                           e, self.color, font=self.font)
+        current_x = x
+        for line in entry.split('\n'):
+            line_width = self.font.getsize(line)[0]
+            if line_width < self.line_width:
+                current_x += (self.line_width - line_width) // 2
+            self.draw.text((current_x, y),
+                           line, self.color, font=self.font)
 
-            y += self.font.getsize(e)[1]
-            new_x = x
+            y += self.font.getsize(line)[1]
+            current_x = x
 
     def generate_bingo(self):
         x, y = self.p, self.line_height
@@ -70,7 +75,7 @@ class Bingo:
                 y += self.line_height + self.p
                 x = self.p
 
-            if i > ((self.size * 5) + 1):
+            if i > ((self.size * 5)):
                 break
 
     def save_bingo(self):
