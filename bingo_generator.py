@@ -11,20 +11,18 @@ class Bingo:
                  fontpath=None, fontsize = 13):
         self.title = title
         self.font = ImageFont.load_default() if not fontpath else ImageFont.truetype(fontpath, fontsize)
+        self.color = fontcolor
         self.img = Image.new("RGBA", (width, height), bgcolor)
         self.draw = ImageDraw.Draw(self.img)
-        self.entries = entries
 
-        self.p = padding
         self.size = size
-        self.color = fontcolor
+        self.p = padding
         marign_bottom = int(height * 0.05)
         self.width, self.height = width, height - marign_bottom
-
-
         self.line_width = (self.width // (self.size - 1) ) - (self.size + 1)  * self.p
         self.line_height = (self.height // (self.size -1)) - self.size * self.p
 
+        self.entries = entries
         if randomize:
             shuffle(entries)
 
