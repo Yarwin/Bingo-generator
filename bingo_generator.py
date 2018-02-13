@@ -7,18 +7,21 @@ from random import shuffle
 class Bingo:
     def __init__(self, entries, title="test", freespace="", size=5, randomize=True,
                  bgcolor='#FFF', fontcolor= '#000',
-                 width=1600, height=900, padding=15,
+                 width=1600, height=900, padding=20,
                  fontpath=None, fontsize = 13):
         self.title = title
         self.font = ImageFont.load_default() if not fontpath else ImageFont.truetype(fontpath, fontsize)
-        self.title_font = ImageFont.load_default() if not fontpath else ImageFont.truetype(fontpath, fontsize*2)
         self.img = Image.new("RGBA", (width, height), bgcolor)
         self.draw = ImageDraw.Draw(self.img)
         self.entries = entries
+
         self.p = padding
         self.size = size
         self.color = fontcolor
-        self.width, self.height = width, height
+        marign_bottom = int(height * 0.05)
+        self.width, self.height = width, height - marign_bottom
+
+
         self.line_width = (self.width // (self.size - 1) ) - (self.size + 1)  * self.p
         self.line_height = (self.height // (self.size -1)) - self.size * self.p
 
@@ -30,10 +33,12 @@ class Bingo:
             self.entries.insert(freespace_index - 1, freespace)
 
     def draw_title(self):
-        height = (self.line_height - self.title_font.getsize(self.title)[1]) // 2
-        self.draw.text(((self.width - self.title_font.getsize(self.title)[0]) // 2,
+        title_font = self.font.font_variant(size=self.font.size*2)
+
+        height = (self.line_height - title_font.getsize(self.title)[1]) // 2
+        self.draw.text(((self.width - title_font.getsize(self.title)[0]) // 2,
                         height),
-                       self.title, self.color, font=self.title_font)
+                       self.title, self.color, font=title_font)
 
     def split_entry(self, entry):
         entry = entry.split(' ')
@@ -41,7 +46,7 @@ class Bingo:
         
         for i in entry[1:]:
             last_line_width = self.font.getsize(output.split('\n')[-1] + i)[0]
-            if last_line_width > self.line_width:
+            if last_line_width > (self.line_width + self.p):
                 output += '\n' + i
             else:
                 output += ' ' + i
@@ -69,9 +74,10 @@ class Bingo:
         for i, entry in enumerate(self.entries, 1):
             self.draw_entry(entry, x, y)
 
-            x += self.line_width
+            x += self.line_width + self.p
 
             if not i % self.size:
+
                 y += self.line_height + self.p
                 x = self.p
 
@@ -83,9 +89,10 @@ class Bingo:
 
 
 if __name__ == '__main__':
-    bing = Bingo([str(i) for i in range(30)], freespace='Freespace',
-                 title='example bingo!',
-                 fontsize=20, fontpath="font")
+    #example usage
+    fields = [str(i) for i in range(30)]
+    bing = Bingo(fields, freespace='Example bingo \n (freespace)',
+                 title='Example bingo!', fontsize=22, height=1200, fontpath='/usr/share/fonts/TTF/LibreFranklin-Bold.ttf')
     bing.split_entries()
     bing.draw_title()
     bing.generate_bingo()
