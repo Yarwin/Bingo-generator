@@ -8,19 +8,17 @@ class Bingo:
     def __init__(self, entries, title="test", freespace="", size=5, randomize=True,
                  bgcolor='#FFF', fontcolor= '#000',
                  width=1600, height=900, padding=20,
-                 fontpath=None, fontsize = 13):
+                 fontpath=None, fontsize=22):
         self.title = title
         self.font = ImageFont.load_default() if not fontpath else ImageFont.truetype(fontpath, fontsize)
         self.color = fontcolor
         self.img = Image.new("RGBA", (width, height), bgcolor)
         self.draw = ImageDraw.Draw(self.img)
-
         self.size = size
         self.p = padding
-        marign_bottom = int(height * 0.05)
-        self.width, self.height = width, height - marign_bottom
+        self.width, self.height = width, height
         self.line_width = (self.width // (self.size - 1) ) - (self.size + 1)  * self.p
-        self.line_height = (self.height // (self.size -1)) - self.size * self.p
+        self.line_height = (self.height // (self.size - 1)) - self.size * self.p
 
         self.entries = entries
         if randomize:
@@ -29,6 +27,27 @@ class Bingo:
         if freespace:
             freespace_index = (self.size // 2) * self.size + self.size // 2 + 1
             self.entries.insert(freespace_index - 1, freespace)
+
+    def draw_lines(self):
+        # draw top line bellow title
+        top_height = self.line_height + self.p
+        bottom_height = (self.line_height + self.p) * (self.size + 1)
+        right_width = (self.line_width + self.p) * (self.size)
+        self.draw.line(xy=[(self.p, top_height), (right_width, top_height)],
+                       fill=(0,0,0, 255), width=4)
+
+        # draw horizontal lines
+        for i in range(1, self.size+1):
+            line_height = ((i + 1) * (self.line_height+self.p))
+            self.draw.line(xy=[(self.p, line_height), (right_width, line_height)],
+                           fill=(0, 0, 0, 255), width=4)
+
+        # draw vertical lines
+        for i in range(0, self.size+1):
+            line_width = (i * (self.line_width+self.p)) if i else self.p
+            self.draw.line(xy=[(line_width, top_height), (line_width, bottom_height)],
+                           fill=(0, 0, 0, 255), width=4)
+
 
     def draw_title(self):
         title_font = self.font.font_variant(size=self.font.size*2)
@@ -60,7 +79,9 @@ class Bingo:
         for line in entry.split('\n'):
             line_width = self.font.getsize(line)[0]
             if line_width < self.line_width:
+                # center text
                 current_x += (self.line_width - line_width) // 2
+
             self.draw.text((current_x, y),
                            line, self.color, font=self.font)
 
@@ -68,30 +89,18 @@ class Bingo:
             current_x = x
 
     def generate_bingo(self):
-        x, y = self.p, self.line_height
+        x, y = self.p, self.line_height + self.p
         for i, entry in enumerate(self.entries, 1):
             self.draw_entry(entry, x, y)
 
             x += self.line_width + self.p
 
             if not i % self.size:
-
                 y += self.line_height + self.p
                 x = self.p
 
-            if i > ((self.size * 5)):
+            if i == (self.size * 5):
                 break
 
     def save_bingo(self):
         self.img.save('{0}.png'.format(self.title))
-
-
-if __name__ == '__main__':
-    #example usage
-    fields = [str(i) for i in range(30)]
-    bing = Bingo(fields, freespace='Example bingo \n (freespace)',
-                 title='Example bingo!', fontsize=22, height=1200, fontpath='/usr/share/fonts/TTF/LibreFranklin-Bold.ttf')
-    bing.split_entries()
-    bing.draw_title()
-    bing.generate_bingo()
-    bing.save_bingo()

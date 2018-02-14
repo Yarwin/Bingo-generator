@@ -1,0 +1,1 @@
+from .bingo_generator import Bingo
