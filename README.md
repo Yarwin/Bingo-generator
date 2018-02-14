@@ -1,3 +1,6 @@
+Bingo generator
+---------------
+
 Simple bingo generator written in python.
 
 Just simply install the package using `python -m pip install .`, and use CLI script directly from your shell with `bingo.py`. The first argument goes for title of the bingo, the rest - divided with `##` sequence - are bingo fields.
