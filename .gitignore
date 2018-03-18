@@ -10,3 +10,8 @@
 
 # env folder
 /env/
+
+# Other
+.idea/
+bl.py
+NADAJO ORGONITY!.png
