@@ -2,7 +2,7 @@ from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 from random import shuffle
-
+import os
 
 class Bingo:
     def __init__(self, entries: list, title: str ="test", freespace: str = "", size: int = 5, randomize: bool = True,
@@ -10,14 +10,14 @@ class Bingo:
                  width: int = 1600, height: int = 900, padding: int = 20,
                  fontpath: str = None, fontsize: int = 22):
         self.title = title
-        self.font = ImageFont.truetype('./font/Archivo-Bold.ttf', fontsize) if not fontpath else ImageFont.truetype(fontpath, fontsize)
+        self.font = ImageFont.truetype(os.path.abspath('./font/Archivo-Bold.ttf'), fontsize) if not fontpath else ImageFont.truetype(fontpath, fontsize)
         self.color = fontcolor
         self.img = Image.new("RGBA", (width, height), bgcolor)
         self.draw = ImageDraw.Draw(self.img)
         self.size = size
         self.p = padding
         self.width, self.height = width, height
-        self.line_width = (self.width // (self.size - 1) ) - (self.size + 1)  * self.p
+        self.line_width = (self.width // (self.size - 1) ) - (self.size + 1) * self.p
         self.line_height = (self.height // (self.size - 1)) - self.size * self.p
 
         self.entries = entries
@@ -125,3 +125,4 @@ class Bingo:
         bing.generate_bingo()
         bing.draw_lines()
         bing.save_bingo()
+        return bing

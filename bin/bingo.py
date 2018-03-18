@@ -1,12 +1,15 @@
 #!/usr/bin/env python
+import csv
 
 import click
+from io import StringIO
+
 from bingo_generator import Bingo
 
 
 @click.command()
 @click.argument('title', nargs=1)
-@click.argument('fields', nargs=-1)
+@click.argument('fields', nargs=-1, type=click.UNPROCESSED)
 @click.option('--freespace', default='',
               help='Freespace field for your bingo')
 @click.option('--size', default=5,
@@ -15,7 +18,7 @@ from bingo_generator import Bingo
               help="determine whether or not to shuffle bingo fields. True or False, True by default")
 @click.option('--bgcolor', default='#FFF',
               help='Background color')
-@click.option('--fontpath', default='./Arvo-Bold.ttf',
+@click.option('--fontpath',
               help='Path to font of your choice')
 @click.option('--color', default='#000',
               help='Font color')
@@ -28,20 +31,15 @@ from bingo_generator import Bingo
 def cli(title, fields, freespace, size, randomize, bgcolor, fontpath, color, fontsize, padding, dimensions):
     """
     Bingo generator. \n
-    FIELDS: Input bingo fields splitted by '##' sequence. \n
+    FIELDS: Input bingo fields formatted as CSV string \n
     TITLE: Title of the Bingo. \n
     """
-    fields = "".join([str(i) for i in fields]).split('##')
-    bing = Bingo(fields, title=title, freespace=freespace, size=size, randomize=randomize,
+
+    entries = list(csv.reader(StringIO(" ".join(i for i in fields))))[0]
+    Bingo.make_bingo_from_scratch(entries=entries, title=title, freespace=freespace, size=size, randomize=randomize,
                  bgcolor=bgcolor, fontcolor=color,
                  width=dimensions[0], height=dimensions[1], padding=padding,
-                 fontpath=fontpath, fontsize = fontsize
-                 )
-    bing.split_entries()
-    bing.draw_title()
-    bing.generate_bingo()
-    bing.draw_lines()
-    bing.save_bingo()
+                 fontpath=fontpath, fontsize = fontsize)
 
 
 if __name__ == '__main__':
