@@ -5,7 +5,7 @@ Overwiew
 ----
 A Bingo generator written in python using a PIL. 
 
-The main purpose of this module is to generate randomized bingo, just for the delight of the crowd.
+The main purpose of this module is to generate  bingo with randomly shuffled fields.
 
 #### Usage
 Just simply install the package using `python -m pip install .` in folder with setup.py.
@@ -93,11 +93,6 @@ Font taken from https://github.com/google/fonts/blob/master/ofl/archivo/Archivo-
 ### License
 MIT
 
-Roadmap
----------
-- Make proper tests 
-- Add image support as bingo fields
-- Write stand-alone `.exe` client for windows users
  
 Contributing
 ---------
